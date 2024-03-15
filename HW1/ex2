@@ -1,0 +1,53 @@
+import java.io.*;
+
+class Result {
+
+    public static int sumOfNumbers(int size) {
+        // Validate the size parameter
+        if (size < 0 && size > 9) {
+            throw new IllegalArgumentException("0");
+        }
+
+        // Handle the special case for size = 0
+        if (size <= 0) {
+            return 0;
+        }
+        if (size >= 10) {
+            return 0;
+        }
+
+        int sum = 0;
+        int maxSum = size;
+        int currentNum = 1;
+
+        while (size != 1) {
+            for (int i = currentNum; i <= maxSum; i++) {
+                sum += 4 * i;
+            }
+            ++currentNum;
+            --size;
+        }
+        sum += 2 * maxSum;
+        return sum;
+    }
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int size = Integer.parseInt(bufferedReader.readLine().trim());
+
+        try {
+            int result = Result.sumOfNumbers(size);
+            bufferedWriter.write(String.valueOf(result));
+        } catch (IllegalArgumentException e) {
+            bufferedWriter.write("Invalid input: " + e.getMessage());
+        }
+
+        bufferedWriter.newLine();
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}
