@@ -1,1 +1,47 @@
-test
+//working with 10/10 test cases for ex1 of HW1 Java course
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+class Result {
+
+public static int countNumbers(int bottom, int top, int difference) {
+        if (bottom < 0 || top < 0 || bottom > top) {
+            return 0;
+        }
+        int counter = 0;
+        while (bottom <= top) {
+            String number = String.valueOf(bottom);
+            String bottomFixer = number.substring(1) + number.charAt(0);
+            if (Integer.parseInt(bottomFixer) - bottom > difference) {
+                ++counter;
+            }
+            ++bottom;
+        }
+        return counter;
+    }
+
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int bottom = Integer.parseInt(bufferedReader.readLine().trim());
+
+        int top = Integer.parseInt(bufferedReader.readLine().trim());
+
+        int difference = Integer.parseInt(bufferedReader.readLine().trim());
+
+        int result = Result.countNumbers(bottom, top, difference);
+
+        bufferedWriter.write(String.valueOf(result));
+        bufferedWriter.newLine();
+
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}
