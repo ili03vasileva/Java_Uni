@@ -1,0 +1,67 @@
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+class Manager {
+    private String name;
+    private LocalDate hiringDate;
+
+    public Manager(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+
+    public LocalDate getHiringDate() {
+        return hiringDate;
+    }
+
+
+    public void setHiringDate(LocalDate hiringDate) {
+      
+        if (hiringDate.isAfter(LocalDate.now())) {
+            this.hiringDate = LocalDate.of(2020, 1, 1); // If it is, set the date to 2020-01-01
+        } else {
+            this.hiringDate = hiringDate;
+        }
+    }
+
+    public long numberOfYearsInCompanyTill(LocalDate currentDate) {
+        return ChronoUnit.YEARS.between(hiringDate, currentDate);
+    }
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
+        String name = bufferedReader.readLine();
+
+        int hiringYear = Integer.parseInt(bufferedReader.readLine().trim());
+        int hiringMonth = Integer.parseInt(bufferedReader.readLine().trim());
+        int hiringDay = Integer.parseInt(bufferedReader.readLine().trim());
+
+        int currentYear = Integer.parseInt(bufferedReader.readLine().trim());
+        int currentMonth = Integer.parseInt(bufferedReader.readLine().trim());
+        int currentDay = Integer.parseInt(bufferedReader.readLine().trim());
+
+    
+        Manager manager = new Manager(name);
+
+      
+        manager.setHiringDate(LocalDate.of(hiringYear, hiringMonth, hiringDay));
+
+    
+        System.out.println(manager.getHiringDate());
+
+        System.out.println(manager.numberOfYearsInCompanyTill(LocalDate.of(currentYear, currentMonth, currentDay)));
+
+        bufferedReader.close();
+    }
+}
