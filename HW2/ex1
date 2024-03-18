@@ -1,15 +1,4 @@
-// for 80/100
 import java.io.*;
-import java.math.*;
-import java.security.*;
-import java.text.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.function.*;
-import java.util.regex.*;
-import java.util.stream.*;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 
 class Manufacturer {
     String name;
@@ -31,6 +20,9 @@ class ElectricDevice {
     }
 
     int warranty() {
+        if (minWarrantyMonths < 6){
+            minWarrantyMonths = 6;
+        }
         if (manufacturer.extendedWarranty) {
             return minWarrantyMonths + 12;
         } else {
@@ -51,7 +43,7 @@ class Cooker extends ElectricDevice {
     int warranty() {
         int baseWarranty = super.warranty();
         if (isGas) {
-            return baseWarranty + 12;
+            return baseWarranty + 12; // Adding 12 months for gas cookers
         } else {
             return baseWarranty;
         }
@@ -70,7 +62,7 @@ class WashingMachine extends ElectricDevice {
     int warranty() {
         int baseWarranty = super.warranty();
         if (hasDryFunction) {
-            return baseWarranty + minWarrantyMonths / 2; // 50% of minWarrantyMonths
+            return baseWarranty + minWarrantyMonths / 2; // Adding 50% of minWarrantyMonths for machines with dryer function
         } else {
             return baseWarranty;
         }
