@@ -1,0 +1,95 @@
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import java.util.regex.*;
+import java.util.stream.*;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
+        String materialName = bufferedReader.readLine();
+        boolean isFragile = Integer.parseInt(bufferedReader.readLine().trim()) != 0;
+        boolean toClientsAddress = Integer.parseInt(bufferedReader.readLine().trim()) != 0;
+        double minPrice = Double.parseDouble(bufferedReader.readLine().trim());
+        double weight = Double.parseDouble(bufferedReader.readLine().trim());
+        double pricePerKg = Double.parseDouble(bufferedReader.readLine().trim());
+        double additionalPrice = Double.parseDouble(bufferedReader.readLine().trim());
+
+        Material material = new Material(materialName, isFragile);
+        Deliverable document = new Document(minPrice, toClientsAddress);
+        System.out.println(document.deliveryPrice());
+
+        Deliverable weightedItem = new WeightedItem(material, weight, pricePerKg, toClientsAddress);
+        System.out.println(weightedItem.deliveryPrice());
+
+        bufferedReader.close();
+    }
+}
+
+// Interface for deliverable objects
+interface Deliverable {
+    double deliveryPrice();
+}
+
+// Material class
+class Material {
+    String name;
+    boolean fragile;
+
+    Material(String name, boolean fragile) {
+        this.name = name;
+        this.fragile = fragile;
+    }
+
+    boolean isFragile() {
+        return fragile;
+    }
+}
+
+// Document class that implements the Deliverable interface
+class Document implements Deliverable {
+    double minPrice;
+    boolean toClientsAddress;
+
+    Document(double minPrice, boolean toClientsAddress) {
+        this.minPrice = minPrice;
+        this.toClientsAddress = toClientsAddress;
+    }
+
+    public double deliveryPrice() {
+        return toClientsAddress ? minPrice + 2 : minPrice;
+    }
+}
+
+// WeightedItem class that implements the Deliverable interface
+class WeightedItem implements Deliverable {
+    Material material;
+    double weight;
+    double pricePerKg;
+    boolean toClientsAddress;
+
+    WeightedItem(Material material, double weight, double pricePerKg, boolean toClientsAddress) {
+        this.material = material;
+        this.weight = weight;
+        this.pricePerKg = pricePerKg;
+        this.toClientsAddress = toClientsAddress;
+    }
+
+    public double deliveryPrice() {
+        double totalPrice = weight * pricePerKg;
+        if (toClientsAddress) {
+            totalPrice += 2;
+        }
+        if (material.isFragile()) {
+            totalPrice *= 1.01;
+        }
+        return totalPrice;
+    }
+}
