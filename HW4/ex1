@@ -1,0 +1,159 @@
+import java.io.*;
+import java.math.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import java.util.regex.*;
+import java.util.stream.*;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+
+class Employee {
+    private String name;
+    private int workedHours;
+    private BigDecimal additionalSalary;
+    private ContractType contractType;
+
+    public Employee(String name, int workedHours, BigDecimal additionalSalary, ContractType contractType) {
+        this.name = name;
+        this.workedHours = workedHours;
+        this.additionalSalary = additionalSalary;
+        this.contractType = contractType;
+    }
+
+    public BigDecimal salary(List<Double> minSalaryList) {
+        double minSalary = minSalaryList.get(contractType.ordinal());
+        BigDecimal totalSalary = BigDecimal.valueOf(workedHours * minSalary);
+        totalSalary = totalSalary.add(additionalSalary.multiply(BigDecimal.valueOf(workedHours)));
+        return totalSalary;
+    }
+
+    public ContractType getContractType() {
+        return contractType;
+    }
+
+    public BigDecimal getAdditionalSalary() {
+        return additionalSalary;
+    }
+
+    public void setAdditionalSalary(BigDecimal additionalSalary) {
+        this.additionalSalary = additionalSalary;
+    }
+}
+
+enum ContractType {
+    PERMANENT, PART_TIME, TRAINEE
+}
+
+class Company {
+    private String name;
+    private int maxNumberOfEmployees;
+    private List<Employee> employees = new ArrayList<>();
+
+    public Company(String name, int maxNumberOfEmployees) {
+        this.name = name;
+        this.maxNumberOfEmployees = maxNumberOfEmployees;
+    }
+
+    public void hireEmployee(Employee employee) {
+        if (employees.size() < maxNumberOfEmployees) {
+            employees.add(employee);
+        }
+    }
+
+    public void fireEmployee(Employee employee) {
+        employees.remove(employee);
+    }
+
+    public BigDecimal averageSalary(List<Double> minSalaryList) {
+        if (employees.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal totalSalary = BigDecimal.ZERO;
+        for (Employee employee : employees) {
+            totalSalary = totalSalary.add(employee.salary(minSalaryList));
+        }
+        return totalSalary.divide(BigDecimal.valueOf(employees.size()), 2, RoundingMode.HALF_UP);
+    }
+
+    public void increaseSalaries(BigDecimal increasePercentage) {
+        for (Employee employee : employees) {
+            BigDecimal currentAdditionalSalary = employee.getAdditionalSalary();
+            BigDecimal increaseAmount = currentAdditionalSalary.multiply(increasePercentage.divide(BigDecimal.valueOf(100)));
+            employee.setAdditionalSalary(currentAdditionalSalary.add(increaseAmount));
+        }
+    }
+
+    public BigDecimal averageSalaryByType(ContractType contractType, List<Double> minSalaryList) {
+        if (employees.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal totalSalary = BigDecimal.ZERO;
+        int count = 0;
+        for (Employee employee : employees) {
+            if (employee.getContractType() == contractType) {
+                totalSalary = totalSalary.add(employee.salary(minSalaryList));
+                count++;
+            }
+        }
+        if (count == 0) {
+            return BigDecimal.ZERO;
+        }
+        return totalSalary.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
+    }
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
+        String companyName = bufferedReader.readLine();
+
+        int maxNumberOfEmployees = Integer.parseInt(bufferedReader.readLine().trim());
+
+        List<Double> minSalaryList = Stream.of(bufferedReader.readLine().replaceAll("\\s+$", "").split(" "))
+                .map(Double::parseDouble)
+                .collect(toList());
+
+        List<String> namesList = Stream.of(bufferedReader.readLine().replaceAll("\\s+$", "").split(" "))
+                .collect(toList());
+
+        List<Integer> workedHoursList = Stream.of(bufferedReader.readLine().replaceAll("\\s+$", "").split(" "))
+                .map(Integer::parseInt)
+                .collect(toList());
+
+        List<String> contractTypeList = Stream.of(bufferedReader.readLine().replaceAll("\\s+$", "").split(" "))
+                .collect(toList());
+
+        List<Double> additionalSalaryList = Stream.of(bufferedReader.readLine().replaceAll("\\s+$", "").split(" "))
+                .map(Double::parseDouble)
+                .collect(toList());
+
+        String contractType = bufferedReader.readLine();
+
+        double increasePercentage = Double.parseDouble(bufferedReader.readLine().trim());
+
+        List<Employee> employees = new ArrayList<>();
+        for (int i = 0; i < namesList.size(); i++) {
+            Employee employee = new Employee(namesList.get(i), workedHoursList.get(i),
+                    BigDecimal.valueOf(additionalSalaryList.get(i)), ContractType.valueOf(contractTypeList.get(i)));
+            employees.add(employee);
+        }
+
+        Company company = new Company(companyName, maxNumberOfEmployees);
+        for (Employee employee : employees) {
+            company.hireEmployee(employee);
+        }
+
+        System.out.println(company.averageSalary(minSalaryList));
+
+        company.increaseSalaries(BigDecimal.valueOf(increasePercentage));
+
+        System.out.println(company.averageSalary(minSalaryList));
+
+        System.out.println(company.averageSalaryByType(ContractType.valueOf(contractType), minSalaryList));
+
+        bufferedReader.close();
+    }
+}
